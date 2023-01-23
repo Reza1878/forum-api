@@ -100,7 +100,7 @@ container.register([
   },
 ]);
 
-// registering use cases
+// registering use case
 container.register([
   {
     key: AddUserUseCase.name,

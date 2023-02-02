@@ -64,6 +64,7 @@ describe('/threads/{threadId}/comments endpoint', () => {
       });
       expect(response.statusCode).toEqual(401);
     });
+
     it('should response 400 when given invalid payload', async () => {
       const server = await createServer(container);
 
@@ -98,6 +99,7 @@ describe('/threads/{threadId}/comments endpoint', () => {
       expect(typeof responseJson.message).toEqual('string');
       expect(responseJson.message).not.toEqual('');
     });
+
     it('should response 201 when given valid payload', async () => {
       const server = await createServer(container);
 

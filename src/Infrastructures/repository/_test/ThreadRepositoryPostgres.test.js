@@ -122,6 +122,7 @@ describe('ThreadRepositoryPostgres', () => {
       expect(threadDetail.comments[0].id).toEqual('comment-123');
       expect(threadDetail.comments[0].username).toEqual('dicoding');
       expect(threadDetail.comments[0].content).toEqual('Komentar');
+      expect(threadDetail.comments[0].likeCount).toEqual(0);
       expect(typeof threadDetail.comments[0].date).toBe('string');
       expect(threadDetail.comments[0].date).not.toEqual('');
       expect(new Date(threadDetail.comments[0].date)).toEqual(currentDate);
@@ -130,6 +131,7 @@ describe('ThreadRepositoryPostgres', () => {
       expect(threadDetail.comments[1].content).toEqual('Komentar');
       expect(typeof threadDetail.comments[1].date).toBe('string');
       expect(threadDetail.comments[1].date).not.toEqual('');
+      expect(threadDetail.comments[1].likeCount).toEqual(0);
       expect(new Date(threadDetail.comments[1].date)).toEqual(newDate);
     });
     it("should return not found error when thread doesn't exist", async () => {

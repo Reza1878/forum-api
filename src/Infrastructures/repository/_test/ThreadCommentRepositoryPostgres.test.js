@@ -201,4 +201,31 @@ describe('ThreadCommentRepositoryPostgres', () => {
       ).resolves.not.toThrow(AuthorizationError);
     });
   });
+
+  describe('verifyThreadCommentAvailability', () => {
+    it('should throw not found error when comment is not available', async () => {
+      const threadCommentRepositoryPostgres =
+        new ThreadCommentRepositoryPostgres(pool, () => '123');
+
+      await expect(
+        threadCommentRepositoryPostgres.verifyThreadCommentAvailability(
+          'comment-124',
+        ),
+      ).rejects.toThrowError(NotFoundError);
+    });
+    it('should throw not found error when comment is not available', async () => {
+      await UsersTableTestHelper.addUser({});
+      await ThreadsTableTestHelper.addThread({});
+      await ThreadCommentsTableTestHelper.addThreadComment({});
+
+      const threadCommentRepositoryPostgres =
+        new ThreadCommentRepositoryPostgres(pool, () => '123');
+
+      await expect(
+        threadCommentRepositoryPostgres.verifyThreadCommentAvailability(
+          'comment-123',
+        ),
+      ).resolves.not.toThrowError(NotFoundError);
+    });
+  });
 });

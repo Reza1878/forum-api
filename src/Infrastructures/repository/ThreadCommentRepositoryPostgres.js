@@ -26,10 +26,13 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
   async getThreadCommentById(id) {
     const query = {
       text: `
-        SELECT tc.*, u.username
+        SELECT tc.*, u.username, COALESCE(COUNT(tcl.id), 0) as like_count
         FROM thread_comments tc
         JOIN users u ON u.id = tc.owner 
+        LEFT JOIN thread_comment_likes tcl ON tcl.thread_comment_id = tc.id
         WHERE tc.id = $1
+        GROUP BY tc.id, tc.content, tc.owner, tc.thread_id, tc.is_delete, tc.date, u.username
+        ORDER BY tc.date ASC
       `,
       values: [id],
     };
@@ -37,22 +40,34 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     if (!rowCount) {
       throw new NotFoundError('Komentar tidak ditemukan');
     }
-    return new ThreadCommentDetail(rows[0]);
+    return new ThreadCommentDetail({
+      ...rows[0],
+      likeCount: parseInt(rows[0].like_count, 10),
+    });
   }
 
   async getThreadCommentByThreadId(threadId) {
     const query = {
       text: `
-        SELECT tc.*, u.username
+        SELECT tc.*, u.username, COALESCE(COUNT(tcl.id), 0) as like_count
         FROM thread_comments tc
         JOIN users u ON u.id = tc.owner 
+        LEFT JOIN thread_comment_likes tcl ON tcl.thread_comment_id = tc.id
         WHERE tc.thread_id = $1
+        GROUP BY tc.id, tc.content, tc.owner, tc.thread_id, tc.is_delete, tc.date, u.username
         ORDER BY tc.date ASC
       `,
       values: [threadId],
     };
     const { rows } = await this._pool.query(query);
-    return rows.map((item) => new ThreadCommentDetail(item));
+    return rows.map(
+      (item) =>
+        // eslint-disable-next-line implicit-arrow-linebreak
+        new ThreadCommentDetail({
+          ...item,
+          likeCount: parseInt(item.like_count, 10),
+        }),
+    );
   }
 
   async deleteThreadComment({ id }) {
@@ -75,6 +90,18 @@ class ThreadCommentRepositoryPostgres extends ThreadCommentRepository {
     const threadOwner = rows[0].owner;
     if (owner !== threadOwner) {
       throw new AuthorizationError('anda tidak berhak menghapus resource ini');
+    }
+  }
+
+  async verifyThreadCommentAvailability(id) {
+    const query = {
+      text: 'SELECT id FROM thread_comments WHERE id = $1',
+      values: [id],
+    };
+    const { rowCount } = await this._pool.query(query);
+
+    if (!rowCount) {
+      throw new NotFoundError('Komentar tidak ditemukan');
     }
   }
 }

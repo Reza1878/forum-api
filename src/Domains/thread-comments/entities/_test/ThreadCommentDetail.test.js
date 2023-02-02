@@ -12,6 +12,7 @@ describe('ThreadCommentDetail entities', () => {
       username: '123',
       id: '123',
       date: '2022-12-01',
+      likeCount: '0',
     };
     expect(() => new ThreadCommentDetail(payload)).toThrowError(
       'THREAD_COMMENT_DETAIL.NOT_MEET_DATA_TYPE_SPECIFICATION',
@@ -23,6 +24,7 @@ describe('ThreadCommentDetail entities', () => {
       username: '123',
       id: '123',
       date: '2022-12-01',
+      likeCount: 0,
     };
     const threadComment = new ThreadCommentDetail(payload);
     expect(threadComment.content).toEqual(payload.content);
@@ -38,6 +40,7 @@ describe('ThreadCommentDetail entities', () => {
       id: '123',
       date: '2022-12-01',
       is_delete: true,
+      likeCount: 0,
     };
     const threadComment = new ThreadCommentDetail(payload);
     expect(threadComment.content).toEqual('**komentar telah dihapus**');

@@ -25,8 +25,17 @@ describe('DislikeThreadCommentUseCase', () => {
     const mockDislikeThreadCommentUseCase = new DislikeThreadCommentUseCase({
       threadRepository: mockThreadRepository,
     });
+
     await expect(
       mockDislikeThreadCommentUseCase.execute(useCasePayload),
+    ).rejects.toThrowError(new NotFoundError('Thread not found'));
+
+    expect(mockThreadRepository.verifyThreadAvailability).toBeCalledWith(
+      useCasePayload.threadId,
+    );
+
+    await expect(
+      mockThreadRepository.verifyThreadAvailability,
     ).rejects.toThrowError(new NotFoundError('Thread not found'));
   });
 
@@ -55,6 +64,18 @@ describe('DislikeThreadCommentUseCase', () => {
 
     await expect(
       mockDislikeThreadCommentUseCase.execute(useCasePayload),
+    ).rejects.toThrowError(new NotFoundError('Thread comment not found'));
+
+    expect(mockThreadRepository.verifyThreadAvailability).toBeCalledWith(
+      useCasePayload.threadId,
+    );
+
+    expect(
+      mockThreadCommentRepository.verifyThreadCommentAvailability,
+    ).toBeCalledWith(useCasePayload.threadCommentId);
+
+    await expect(
+      mockThreadCommentRepository.verifyThreadCommentAvailability,
     ).rejects.toThrowError(new NotFoundError('Thread comment not found'));
   });
 
@@ -88,6 +109,12 @@ describe('DislikeThreadCommentUseCase', () => {
     await expect(
       mockDislikeThreadCommentUseCase.execute(useCasePayload),
     ).resolves.not.toThrowError(NotFoundError);
+    expect(mockThreadRepository.verifyThreadAvailability).toBeCalledWith(
+      useCasePayload.threadId,
+    );
+    expect(
+      mockThreadCommentRepository.verifyThreadCommentAvailability,
+    ).toBeCalledWith(useCasePayload.threadCommentId);
     expect(
       mockThreadCommentLikeRepository.deleteThreadCommentLike,
     ).toBeCalledWith(useCasePayload);

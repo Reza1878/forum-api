@@ -30,7 +30,7 @@ describe('ThreadCommentDetail entities', () => {
     expect(threadComment.content).toEqual(payload.content);
     expect(threadComment.username).toEqual(payload.username);
     expect(threadComment.date).toEqual(payload.date);
-    expect(threadComment.threadId).toEqual(payload.threadId);
+    expect(threadComment.likeCount).toEqual(payload.likeCount);
     expect(threadComment.id).toEqual(payload.id);
   });
   it('should return deleted thread comment object correctly', () => {
@@ -46,7 +46,7 @@ describe('ThreadCommentDetail entities', () => {
     expect(threadComment.content).toEqual('**komentar telah dihapus**');
     expect(threadComment.username).toEqual(payload.username);
     expect(threadComment.date).toEqual(payload.date);
-    expect(threadComment.threadId).toEqual(payload.threadId);
+    expect(threadComment.likeCount).toEqual(payload.likeCount);
     expect(threadComment.id).toEqual(payload.id);
   });
 });

@@ -1,5 +1,4 @@
 const NotFoundError = require('../../Commons/exceptions/NotFoundError');
-const ThreadCommentDetail = require('../../Domains/thread-comments/entities/ThreadCommentDetail');
 const AddedThread = require('../../Domains/threads/entities/AddedThread');
 const ThreadDetail = require('../../Domains/threads/entities/ThreadDetail');
 const ThreadRepository = require('../../Domains/threads/ThreadRepository');
@@ -49,27 +48,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
       throw new NotFoundError('Thread tidak ditemukan');
     }
 
-    const commentQuery = {
-      text: `
-        SELECT tc.*, u.username, COALESCE(COUNT(tcl.id), 0) as like_count
-        FROM thread_comments tc
-        JOIN users u ON u.id = tc.owner 
-        LEFT JOIN thread_comment_likes tcl ON tcl.thread_comment_id = tc.id
-        WHERE tc.thread_id = $1
-        GROUP BY tc.id, tc.content, tc.owner, tc.thread_id, tc.is_delete, tc.date, u.username
-        ORDER BY tc.date ASC
-      `,
-      values: [id],
-    };
-    const commentResult = await this._pool.query(commentQuery);
-    // eslint-disable-next-line arrow-body-style
-    const comments = commentResult.rows.map((comment) => {
-      return new ThreadCommentDetail({
-        ...comment,
-        likeCount: +comment.like_count,
-      });
-    });
-    return new ThreadDetail({ ...result.rows[0], comments });
+    return new ThreadDetail({ ...result.rows[0], comments: [] });
   }
 }
 

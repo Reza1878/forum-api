@@ -1,4 +1,7 @@
+/* eslint-disable function-paren-newline */
+/* eslint-disable implicit-arrow-linebreak */
 const ThreadDetail = require('../../../Domains/threads/entities/ThreadDetail');
+const ThreadCommentRepositoryPostgres = require('../../../Infrastructures/repository/ThreadCommentRepositoryPostgres');
 const ThreadRepositoryPostgres = require('../../../Infrastructures/repository/ThreadRepositoryPostgres');
 const GetThreadUseCase = require('../GetThreadUseCase');
 
@@ -8,6 +11,10 @@ describe('GetThreadUseCase', () => {
       id: 'thread-123',
     };
     const mockThreadRepository = new ThreadRepositoryPostgres({}, () => '123');
+    const mockThreadCommentRepository = new ThreadCommentRepositoryPostgres(
+      {},
+      () => '123',
+    );
     mockThreadRepository.getThreadById = jest.fn().mockImplementation(
       async () =>
         // eslint-disable-next-line implicit-arrow-linebreak
@@ -23,8 +30,12 @@ describe('GetThreadUseCase', () => {
         ),
       // eslint-disable-next-line function-paren-newline
     );
+    mockThreadCommentRepository.getThreadCommentByThreadId = jest
+      .fn()
+      .mockImplementation(async () => Promise.resolve([]));
     const getThreadUseCase = new GetThreadUseCase({
       threadRepository: mockThreadRepository,
+      threadCommentRepository: mockThreadCommentRepository,
     });
     const thread = await getThreadUseCase.execute(useCasePayload);
     expect(mockThreadRepository.getThreadById).toBeCalledWith(
@@ -43,9 +54,13 @@ describe('GetThreadUseCase', () => {
       id: 'thread-123',
     };
     const mockThreadRepository = new ThreadRepositoryPostgres({}, () => '123');
-    mockThreadRepository.getThreadById = jest.fn().mockImplementation(
-      async () =>
-        // eslint-disable-next-line implicit-arrow-linebreak
+    const mockThreadCommentRepository = new ThreadCommentRepositoryPostgres(
+      {},
+      () => '123',
+    );
+    mockThreadRepository.getThreadById = jest
+      .fn()
+      .mockImplementation(async () =>
         Promise.resolve(
           new ThreadDetail({
             id: 'thread-123',
@@ -53,26 +68,33 @@ describe('GetThreadUseCase', () => {
             body: 'body',
             date: '2022-12-12',
             username: 'test',
-            comments: [
-              {
-                date: '2022-12-12',
-                username: 'john',
-                id: 'comment-123',
-                content: 'komentar 1',
-              },
-              {
-                date: '2022-12-12',
-                username: 'doe',
-                id: 'comment-124',
-                content: 'komentar 2',
-              },
-            ],
+            comments: [],
           }),
         ),
-      // eslint-disable-next-line function-paren-newline
-    );
+      );
+    mockThreadCommentRepository.getThreadCommentByThreadId = jest
+      .fn()
+      .mockImplementation(async () =>
+        Promise.resolve([
+          {
+            date: '2022-12-12',
+            username: 'john',
+            id: 'comment-123',
+            content: 'komentar 1',
+            likeCount: 0,
+          },
+          {
+            date: '2022-12-12',
+            username: 'doe',
+            id: 'comment-124',
+            content: 'komentar 2',
+            likeCount: 0,
+          },
+        ]),
+      );
     const getThreadUseCase = new GetThreadUseCase({
       threadRepository: mockThreadRepository,
+      threadCommentRepository: mockThreadCommentRepository,
     });
     const thread = await getThreadUseCase.execute(useCasePayload);
     expect(mockThreadRepository.getThreadById).toBeCalledWith(

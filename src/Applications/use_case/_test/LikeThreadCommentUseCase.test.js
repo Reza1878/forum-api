@@ -60,6 +60,9 @@ describe('LikeThreadCommentUseCase', () => {
     await expect(
       mockLikeThreadCommentUseCase.execute(useCasePayload),
     ).rejects.toThrowError(new NotFoundError('Thread comment not found'));
+    expect(mockThreadRepository.verifyThreadAvailability).toBeCalledWith(
+      useCasePayload.threadId,
+    );
     expect(
       mockThreadCommentRepository.verifyThreadCommentAvailability,
     ).toBeCalledWith(useCasePayload.threadCommentId);
@@ -95,6 +98,12 @@ describe('LikeThreadCommentUseCase', () => {
     await expect(
       mockLikeThreadCommentUseCase.execute(useCasePayload),
     ).resolves.not.toThrowError(NotFoundError);
+    expect(mockThreadRepository.verifyThreadAvailability).toBeCalledWith(
+      useCasePayload.threadId,
+    );
+    expect(
+      mockThreadCommentRepository.verifyThreadCommentAvailability,
+    ).toBeCalledWith(useCasePayload.threadCommentId);
     expect(mockThreadCommentLikeRepository.addThreadCommentLike).toBeCalledWith(
       useCasePayload,
     );

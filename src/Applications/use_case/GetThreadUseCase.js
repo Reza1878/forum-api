@@ -1,6 +1,7 @@
 class GetThreadUseCase {
-  constructor({ threadRepository }) {
+  constructor({ threadRepository, threadCommentRepository }) {
     this._threadRepository = threadRepository;
+    this._threadCommentRepository = threadCommentRepository;
   }
 
   async execute(useCasePayload) {
@@ -8,7 +9,9 @@ class GetThreadUseCase {
 
     const { id } = useCasePayload;
     const thread = await this._threadRepository.getThreadById(id);
-    return thread;
+    const comments =
+      await this._threadCommentRepository.getThreadCommentByThreadId(id);
+    return { ...thread, comments };
   }
 
   // eslint-disable-next-line class-methods-use-this
